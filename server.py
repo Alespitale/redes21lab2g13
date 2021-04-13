@@ -6,8 +6,12 @@
 # Copyright 2008-2010 Natalia Bidart y Daniel Moisset
 # $Id: server.py 656 2013-03-18 23:49:11Z bc $
 
+import errno
 import optparse
 import socket
+import sys
+from os.path import exists
+
 import connection
 from constants import *
 
@@ -21,30 +25,37 @@ class Server(object):
     def __init__(self, addr=DEFAULT_ADDR, port=DEFAULT_PORT,
                  directory=DEFAULT_DIR):
         print("Serving %s on %s:%s." % (directory, addr, port))
-        # FALTA: Crear socket del servidor, configurarlo, asignarlo
-        # a una dirección y puerto, etc.
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.socket.bind((addr, port))
         print ("socket binded to %s" %(port)) 
-        self.socket.listen(1)
-        print ("socket is listening")  
+        self.directory = directory
 
     def serve(self):
         """
         Loop principal del servidor. Se acepta una conexión a la vez
         y se espera a que concluya antes de seguir.
         """
-        # FALTA: Aceptar una conexión al server, crear una
-        # Connection para la conexión y atenderla hasta que termine.
-        
-        server, addr = self.socket.accept()
 
-        con = connection.Connection(server, "files")
+        try:        
+            self.socket.listen(1)
+            print ("socket is listening")  
+            while True:
 
-        while True:
-            done = con.handle()
-            if done == 1:
-                break
+                try:
+
+                    server, addr = self.socket.accept()
+                    con = connection.Connection(server, self.directory)
+                    con.handle()
+                    server.close()
+
+                except IOError as e:
+                    if e.errno == errno.EPIPE:
+                        con.close()
+
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt. Closing connection")
+            self.socket.close()
         
 
 def main():

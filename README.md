@@ -1,29 +1,21 @@
-# README #
+# Laboratorio 2: Aplicación Servidor y protocolo HFTP
 
-This README would normally document whatever steps are necessary to get your application up and running.
+## Redes y Sistemas Distribuidos 2021
 
-### What is this repository for? ###
+### Integrantes del grupo:
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+- Facundo Buc
+- Agustin Silva Fiorentino
+- Alejandro Claudio Spitale
 
-### How do I get set up? ###
+### Estructuración y tomas de decisiones del servidor
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+El servidor esta compuesto por dos clases llamadas "Server" y "Connection", en la primera clase esta implementada todo lo referido a la conexión, aceptación y manipulación del cliente ingresante al socket, donde los pedidos son esperados 1 por 1 hasta completar todos los pedidos. En la segunda clase tenemos implementada todo lo referido a la manipulación de comandos y posibles errores de los mismos, recorriendo una queue de comandos por cada cliente hasta satisfacer dicho cliente.
 
-### Contribution guidelines ###
+### Dificultades encontradas en el proceso
 
-* Writing tests
-* Code review
-* Other guidelines
+Tuvimos muchas dificultades en un principio en entender la estructura general del servidor y que tenían que hacer cada función, pudimos solventarlo viendo las preguntas que los compañeros realizaron en zulip y a prueba y error, también viendo el archivo cliente y server-test, para darnos una idea de como el servidor y el cliente se comunican.
 
-### Who do I talk to? ###
+### Información sobre la realización del laboratorio
 
-* Repo owner or admin
-* Other community or team contact
+Nosotros optamos por usar la herramienta "live share" del IDE Visual Studio Code, y también discord como canal de comunicación de voz, así conseguimos realizar todo el laboratorio, es decír, debartimos todo el tiempo las decisiones a tomar entre los 3 integrantes y debatiendo diferentes ideas para la implementación del mismo. Los push fueron realizados por Facundo porque él fue quien hosteo dicha herramienta.
