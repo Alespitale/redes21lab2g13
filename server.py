@@ -6,15 +6,27 @@
 # Copyright 2008-2010 Natalia Bidart y Daniel Moisset
 # $Id: server.py 656 2013-03-18 23:49:11Z bc $
 
+
 import errno
 import optparse
 import socket
 import sys
 from os.path import exists
-
+import threading
 import connection
 from constants import *
 
+class ClientThread(threading.Thread):
+    def __init__(self,clientAddress,clientsocket,directory):
+
+        threading.Thread.__init__(self)
+        self.socket = clientsocket
+        self.directory = directory
+        print ("New connection added: ", clientAddress)
+    def run(self):
+        con = connection.Connection(self.socket, self.directory)
+        con.handle()
+        self.socket.close()
 
 class Server(object):
     """
@@ -38,21 +50,13 @@ class Server(object):
         """
 
         try:        
-            self.socket.listen(1)
             print ("socket is listening")  
             while True:
 
-                try:
-
-                    server, addr = self.socket.accept()
-                    con = connection.Connection(server, self.directory)
-                    con.handle()
-                    server.close()
-
-                except IOError as e:
-                    if e.errno == errno.EPIPE:
-                        con.close()
-
+                self.socket.listen(1)
+                clientsock, addr = self.socket.accept()
+                newthread = ClientThread(addr, clientsock,self.directory)
+                newthread.start()
         except KeyboardInterrupt:
             print("KeyboardInterrupt. Closing connection")
             self.socket.close()
