@@ -24,9 +24,13 @@ class ClientThread(threading.Thread):
         self.directory = directory
         print ("New connection added: ", clientAddress)
     def run(self):
-        con = connection.Connection(self.socket, self.directory)
-        con.handle()
-        self.socket.close()
+        try:
+            con = connection.Connection(self.socket, self.directory)
+            con.handle()
+            self.socket.close()
+        except IOError as e:
+            if e.errno == errno.EPIPE:
+                con.close()
 
 class Server(object):
     """
@@ -48,19 +52,18 @@ class Server(object):
         Loop principal del servidor. Se acepta una conexión a la vez
         y se espera a que concluya antes de seguir.
         """
-
         try:        
             print ("socket is listening")  
             while True:
-
                 self.socket.listen(1)
                 clientsock, addr = self.socket.accept()
                 newthread = ClientThread(addr, clientsock,self.directory)
                 newthread.start()
+
         except KeyboardInterrupt:
             print("KeyboardInterrupt. Closing connection")
             self.socket.close()
-        
+
 
 def main():
     """Parsea los argumentos y lanza el server"""
